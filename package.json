@@ -1,0 +1,28 @@
+{
+  "name": "useless-box",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A Three.js useless box designed for X Player Cards.",
+  "homepage": "https://xyzzyapps.github.io/useless-box/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xyzzyapps/useless-box.git"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test \"tests/*.test.js\"",
+    "check": "node scripts/check.mjs"
+  },
+  "keywords": [
+    "threejs",
+    "useless-box",
+    "player-card",
+    "webgl"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  }
+}

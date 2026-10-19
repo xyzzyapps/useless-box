@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Useless Box</title>
+  <meta name="description" content="A tiny Three.js machine that turns itself off. Push the switch." />
+  <meta name="theme-color" content="#dfcfb9" />
+
+  <!--
+    Hosted at https://xyzzyapps.github.io/useless-box/
+    X reads these tags and, on desktop, loads the page in the timeline as a Player Card.
+    The domain must pass X's Player Card validator before the inline player appears.
+    Do not add X-Frame-Options or a CSP frame-ancestors rule that blocks x.com.
+    Replace all absolute URLs if the repository is published under another name.
+  -->
+  <meta name="twitter:card" content="player" />
+  <meta name="twitter:title" content="Useless Box" />
+  <meta name="twitter:description" content="Push the switch. It will turn itself off." />
+  <meta name="twitter:image" content="https://xyzzyapps.github.io/useless-box/preview.png" />
+  <meta name="twitter:image:alt" content="An open wooden useless box with an acrylic finger reaching toward its toggle switch." />
+  <meta name="twitter:player" content="https://xyzzyapps.github.io/useless-box/" />
+  <meta name="twitter:player:width" content="480" />
+  <meta name="twitter:player:height" content="480" />
+  <meta property="og:title" content="Useless Box" />
+  <meta property="og:description" content="Push the switch. It will turn itself off." />
+  <meta property="og:image" content="https://xyzzyapps.github.io/useless-box/preview.png" />
+  <meta property="og:image:width" content="480" />
+  <meta property="og:image:height" content="480" />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='22' width='52' height='34' rx='4' fill='%239b4823'/%3E%3Cpath d='M8 24 20 10h36L44 24Z' fill='%23c37245'/%3E%3Ccircle cx='32' cy='39' r='5' fill='%23f0b24a'/%3E%3C/svg%3E" />
+
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #2a190f;
+      --ink-soft: rgba(42, 25, 15, 0.72);
+      --paper: #e4d4bf;
+      --paper-light: #f3e8d9;
+      --paper-deep: #c6b097;
+      --accent: #edb85f;
+      --pill: rgba(40, 25, 15, 0.84);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--paper);
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+
+    #stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      touch-action: none;
+      background:
+        radial-gradient(circle at 46% 30%, rgba(255, 248, 237, 0.96) 0%, rgba(239, 225, 208, 0.86) 34%, rgba(218, 201, 180, 0.92) 67%, rgba(191, 169, 143, 0.98) 100%);
+    }
+
+    #scene {
+      display: block;
+      width: 100%;
+      height: 100%;
+      outline: none;
+      cursor: default;
+      touch-action: none;
+    }
+
+    #scene.is-hovering {
+      cursor: pointer;
+    }
+
+    #scene:focus-visible {
+      outline: 2px solid rgba(255, 226, 163, 0.92);
+      outline-offset: -7px;
+    }
+
+    .vignette,
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .vignette {
+      background:
+        radial-gradient(ellipse at 50% 42%, transparent 46%, rgba(64, 42, 25, 0.08) 72%, rgba(48, 30, 17, 0.24) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    .grain {
+      opacity: 0.055;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.8'/%3E%3C/svg%3E");
+    }
+
+    .hint {
+      position: absolute;
+      left: 50%;
+      bottom: max(2.2%, calc(env(safe-area-inset-bottom, 0px) + 8px));
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 0.7em;
+      margin: 0;
+      padding: 0.72em 1.05em 0.76em;
+      transform: translate(-50%, 8px);
+      border: 1px solid rgba(255, 233, 200, 0.23);
+      border-radius: 999px;
+      background: var(--pill);
+      box-shadow:
+        0 10px 30px rgba(40, 23, 11, 0.18),
+        inset 0 1px 0 rgba(255, 249, 235, 0.13);
+      color: #fbf1e2;
+      font-size: clamp(10px, 2.25vmin, 13px);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 420ms ease, transform 420ms ease;
+    }
+
+    .hint::before {
+      content: "";
+      width: 0.52em;
+      height: 0.52em;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0.16em rgba(237, 184, 95, 0.18);
+    }
+
+    .hint.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .hint-accent {
+      color: var(--accent);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+    }
+
+    .sound {
+      position: absolute;
+      top: max(14px, env(safe-area-inset-top, 0px));
+      right: max(14px, env(safe-area-inset-right, 0px));
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      width: clamp(34px, 7.8vmin, 42px);
+      height: clamp(34px, 7.8vmin, 42px);
+      padding: 0;
+      border: 1px solid rgba(255, 244, 226, 0.42);
+      border-radius: 50%;
+      background: rgba(250, 241, 227, 0.46);
+      box-shadow:
+        0 8px 22px rgba(53, 33, 18, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+      color: #47301e;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+    }
+
+    .sound:hover {
+      background: rgba(255, 248, 235, 0.72);
+      transform: translateY(-1px);
+    }
+
+    .sound:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .sound:focus-visible {
+      outline: 2px solid rgba(255, 221, 154, 0.95);
+      outline-offset: 2px;
+    }
+
+    .sound:disabled {
+      cursor: default;
+      opacity: 0.42;
+    }
+
+    .sound svg {
+      width: 46%;
+      height: 46%;
+      overflow: visible;
+    }
+
+    .sound .icon-off {
+      display: none;
+    }
+
+    .sound.is-muted .icon-on {
+      display: none;
+    }
+
+    .sound.is-muted .icon-off {
+      display: block;
+    }
+
+    .loading {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 2;
+      margin: 0;
+      transform: translate(-50%, -50%);
+      color: var(--ink-soft);
+      font-size: clamp(10px, 2.4vmin, 13px);
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      transition: opacity 500ms ease;
+      pointer-events: none;
+    }
+
+    html[data-ready="true"] .loading {
+      opacity: 0;
+    }
+
+    .error {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 8;
+      width: min(84%, 330px);
+      padding: 18px 20px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(89, 52, 26, 0.18);
+      border-radius: 14px;
+      background: rgba(252, 245, 233, 0.94);
+      box-shadow: 0 18px 50px rgba(54, 32, 16, 0.18);
+      color: var(--ink);
+      text-align: center;
+    }
+
+    .error[hidden] {
+      display: none;
+    }
+
+    .error strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 15px;
+    }
+
+    .error p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    body.is-still .hint,
+    body.is-still .sound,
+    body.is-still .loading {
+      display: none !important;
+    }
+
+    @media (max-width: 280px), (max-height: 280px) {
+      .hint {
+        font-size: 9px;
+        padding: 0.62em 0.9em 0.66em;
+      }
+
+      .sound {
+        width: 30px;
+        height: 30px;
+        top: 9px;
+        right: 9px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hint,
+      .sound,
+      .loading {
+        transition: none;
+      }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/": "./vendor/addons/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="stage" aria-label="Useless Box interactive 3D scene">
+    <canvas
+      id="scene"
+      width="480"
+      height="480"
+      role="button"
+      tabindex="0"
+      aria-keyshortcuts="Space Enter"
+      aria-label="Push the switch to start the useless box."
+    >
+      A wooden useless box with an acrylic finger. This interactive 3D scene needs WebGL.
+    </canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <p id="hint" class="hint is-visible" aria-hidden="true">
+      <span class="hint-accent">PUSH</span>
+      <span>the switch</span>
+    </p>
+    <button id="sound" class="sound" type="button" aria-label="Mute sound" aria-pressed="false" title="Mute sound">
+      <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9.5h3.6L13 5.5v13l-5.4-4H4z" />
+        <path d="M16.2 8.4a5 5 0 0 1 0 7.2" />
+        <path d="M18.7 5.9a8.4 8.4 0 0 1 0 12.2" />
+      </svg>
+      <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9.5h3.6L13 5.5v13l-5.4-4H4z" />
+        <path d="m16.2 9.2 4.8 4.8" />
+        <path d="m21 9.2-4.8 4.8" />
+      </svg>
+    </button>
+    <p class="loading" aria-hidden="true">winding up</p>
+    <div id="error" class="error" role="alert" hidden>
+      <strong>The box refused to start.</strong>
+      <p>Reload in a browser with WebGL enabled. The full error is in the console.</p>
+    </div>
+    <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <noscript>
+    <p style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font-family:Georgia,serif">
+      The useless box needs JavaScript. Ironically, so does turning itself off.
+    </p>
+  </noscript>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
