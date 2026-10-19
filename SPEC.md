@@ -663,7 +663,7 @@ A headless Chrome session was driven over the DevTools Protocol with a forced 48
 
 The curated `preview.png` was captured from `?preview=1` at 480x480.
 
-An audio-specific headless Chrome pass then exercised every cue through an `AnalyserNode`. All cues produced signal, the peak output stayed between 0.037 and 0.153 (well below full scale), the sound lab mounted with the expected buttons, and no runtime exceptions were recorded. This verifies level safety and routing, not subjective timbre; the sound lab remains the review surface for the final tonal judgment.
+An audio-specific headless Chrome pass then exercised every cue through an `AnalyserNode`, both locally and on the deployed page. All cues produced signal, the peak output stayed between 0.037 and 0.158 (well below full scale), the sound lab mounted with the expected buttons, and no runtime exceptions were recorded. This verifies level safety and routing, not subjective timbre; the sound lab remains the review surface for tonal judgment.
 
 ### 13.4 Deployment verification
 
@@ -675,6 +675,7 @@ The static site is live at `https://xyzzyapps.github.io/useless-box/`, served by
 - The response has no `X-Frame-Options` and no restrictive `Content-Security-Policy`.
 - The live HTML contains the expected Player Card and Open Graph metadata.
 - A live 480x480 headless smoke test clicked the switch, observed the FSM run, completed at timeline 3.8, returned to idle, and reported no runtime exceptions.
+- The mechanical/fax-style sound revision is deployed from commit `d7375c7`. Every cue was exercised on the deployed page; all produced signal, peaks stayed at 0.037–0.158, and no runtime exceptions were recorded.
 
 ### 13.5 Manual checks still recommended
 

@@ -149,7 +149,7 @@ See [SPEC.md](SPEC.md) for the full requirements, architecture, dimensions, timi
 - 21 unit tests cover easing, the interaction FSM, both-bone IK reach/mirroring/clamping, the complete cycle, cue ordering, final pose, folded-clearance, and lid-before-arm ordering.
 - `npm run check` verifies every JavaScript module parses and that the page still has the required Player Card metadata, local Three.js files, and no runtime CDN dependency.
 - A headless Chrome smoke test at a forced 480x480 viewport ran against both the local server and the live GitHub Pages URL. It clicked the projected switch position, observed the FSM enter `running`, confirmed the audio context was running, waited for the cycle to return to `idle` at 3.8 seconds, verified the final switch/lid/arm angles, and found no runtime exceptions.
-- The revised audio was exercised in Chrome through an analyser: every cue produced signal, the peak level stayed below full scale (0.037 to 0.153), and no runtime exceptions were recorded.
+- The revised audio was exercised in Chrome through an analyser, both locally and on the deployed page: every cue produced signal, the peak level stayed below full scale (0.037 to 0.158), and no runtime exceptions were recorded.
 - `preview.png` is a real 480x480 render from `?preview=1`.
 
 ## Third-party code

@@ -48,5 +48,5 @@
 - [x] Add a debug-only sound audition panel for reviewing each cue in isolation
 - [x] Check peak levels in Chrome with an analyser and verify no clipping
 - [x] Add a higher, fax-like electronic handshake and servo whine
-- [ ] Await user audition and sound approval
-- [ ] Update SPEC/README, commit, and deploy the revised sound to GitHub Pages
+- [x] Await user audition and sound approval
+- [x] Update SPEC/README, commit, and deploy the revised sound to GitHub Pages (`d7375c7`)
