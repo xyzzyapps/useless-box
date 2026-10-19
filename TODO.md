@@ -51,4 +51,4 @@
 - [x] Await user audition and sound approval
 - [x] Update SPEC/README, commit, and deploy the revised sound to GitHub Pages (`d7375c7`)
 - [x] Show the sound lab by default; retain `?soundlab=0`, preview, and `ui=0` opt-outs
-- [x] Verify the default sound lab locally; commit and push the change for live verification
+- [x] Verify the default sound lab locally and on the live deployment; commit and push
