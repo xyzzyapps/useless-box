@@ -45,8 +45,10 @@
 - [x] Replace sawtooth servo/creak oscillators that read as brass with layered motor noise, low-frequency hum, amplitude modulation, and randomized gear chatter
 - [x] Add distinct start/stop mechanical transients for the lid and acrylic arm
 - [x] Tighten switch clicks and separate mechanical contact sounds from body thunks
-- [x] Add a debug-only sound audition panel for reviewing each cue in isolation
+- [x] Add a sound audition panel for reviewing each cue in isolation
 - [x] Check peak levels in Chrome with an analyser and verify no clipping
 - [x] Add a higher, fax-like electronic handshake and servo whine
 - [x] Await user audition and sound approval
 - [x] Update SPEC/README, commit, and deploy the revised sound to GitHub Pages (`d7375c7`)
+- [x] Show the sound lab by default; retain `?soundlab=0`, preview, and `ui=0` opt-outs
+- [x] Verify the default sound lab locally; commit and push the change for live verification

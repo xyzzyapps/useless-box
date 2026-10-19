@@ -35,7 +35,7 @@ npm run check   # syntax check plus embed metadata/vendor validation
 - The canvas is focusable; press `Space` or `Enter` to push the switch.
 - Use the speaker button in the top-right to mute or unmute the synthesized servo and latch sounds.
 - After a cycle, a small `again?` hint appears. Subsequent pushes work immediately.
-- For sound design work, open `?soundlab=1` to audition each cue in isolation or replay the full cycle. The panel is debug-only and never appears in the normal card view.
+- The SOUND LAB is shown by default. Audition each cue in isolation or replay the full cycle. Use `?soundlab=0` to hide it. It is automatically hidden in `?preview=1` and `?ui=0` captures.
 
 ## Embedding in an X post
 
@@ -88,7 +88,8 @@ These are useful while tuning or taking the preview:
 | URL | Effect |
 | --- | --- |
 | `?debug=1` | Verbose console logs and `window.__uselessBox` access |
-| `?soundlab=1` | Show the debug sound audition panel |
+| `?soundlab=0` | Hide the sound lab; it is visible by default |
+| `?soundlab=1` | Force the sound lab on (for clarity in automated/debug URLs) |
 | `?still=1.95` | Freeze the scene at 1.95 seconds into the cycle |
 | `?still=idle` | Freeze at the initial closed-box pose |
 | `?ui=0` | Hide the hint, speaker button, sound lab, and loading text |
@@ -116,7 +117,7 @@ src/
       scene.js                      Renderer, camera rig, lighting, table
     interaction/input-controller.js  Raycast input, hover, keyboard
     audio/audio-engine.js            Synthesized mechanical and fax-like cues
-    audio/sound-lab.js               Debug cue audition panel
+    audio/sound-lab.js               Default cue audition panel (`?soundlab=0` hides)
   shared/textures.js                 Procedural wood, felt, labels, env, shadow
 tests/                               Node built-in test suite
 scripts/

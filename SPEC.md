@@ -140,8 +140,8 @@ Audio starts on the first pointer or keyboard gesture. No audio file is download
 ### FR-8 Debug and still modes
 
 - `?debug=1` enables verbose logs and exposes `window.__uselessBox`.
-- `?soundlab=1` mounts a debug-only cue audition panel with buttons for every cue and a full-cycle replay button.
-- `?still=<seconds>` freezes the pose at that cycle time, disables pointer input, and hides no UI unless `ui=0`.
+- The cue audition sound lab is shown by default. `?soundlab=0` hides it and `?soundlab=1` explicitly enables it.
+- `?still=<seconds>` freezes the pose at that cycle time, disables pointer input, and keeps the sound lab unless `ui=0`.
 - `?still=idle` or `?still=0` freezes the initial pose.
 - `?ui=0` hides the hint, speaker control, sound lab, and loading text.
 - `?preview=1` freezes at 1.95 seconds and hides UI. This produced `preview.png`.
@@ -246,7 +246,7 @@ flowchart LR
 | Assets | `src/shared/textures.js` | Procedural maps and studio environment |
 | Input | `src/features/interaction/input-controller.js` | Raycast, hover, pointer, keyboard |
 | Audio | `src/features/audio/audio-engine.js` | Mechanical/fax-like Web Audio synthesis and mute |
-| Sound lab | `src/features/audio/sound-lab.js` | Debug-only cue audition panel |
+| Sound lab | `src/features/audio/sound-lab.js` | Default cue audition panel, hideable with query/CSS |
 | Presentation | `index.html` | Player Card metadata, CSS, overlays, import map |
 | Tooling | `scripts/` | Static server and static checks |
 
@@ -613,7 +613,7 @@ The first switch click is scheduled even if `AudioContext.resume()` is still pen
 
 No sound plays before a user gesture because the context is not created until then.
 
-The debug-only `SoundLab` panel is mounted with `?soundlab=1`. It imports the cue buttons, unlocks audio on the first audition click, reports the current cue in a live status line, and can replay the full visual/audio cycle. It is hidden by default and in still/preview modes.
+The `SoundLab` cue panel is mounted by default. It imports the cue buttons, unlocks audio on the first audition click, reports the current cue in a live status line, and can replay the full visual/audio cycle. It is hidden by `?soundlab=0`, by `?ui=0`, and in preview/UI-less captures. A still pose without `ui=0` keeps the panel visible. The close button collapses it for the current session.
 
 ## 13. Testing and verification
 
@@ -707,7 +707,7 @@ Do not add `X-Frame-Options` or a restrictive `frame-ancestors` CSP. The include
   - `scene.model.arm.shoulder.rotation.x`
   - `scene.renderer.info.render`
 - Freeze a pose with `?still=<seconds>&ui=0`; use browser devtools to inspect the scene.
-- Open `?soundlab=1` to audition each cue or the full cycle.
+- The sound lab is visible by default; audition each cue or the full cycle there. Use `?soundlab=0` to hide it.
 - Regenerate the preview with a headless browser pointed at `?preview=1` at 480x480.
 - The dev server prints its URL, debug URL, and preview still URL.
 
@@ -752,7 +752,7 @@ new UselessBoxApp({
   hint,          // hint element
   status,        // aria-live element
   soundButton,   // HTMLButtonElement
-  soundLab = null, // debug audition container
+  soundLab = null, // cue panel container; mounted by default
   debug = false,
   stillTime = null,
   hideUi = false,
@@ -770,7 +770,7 @@ app.dispose()
 - `audio`
 - `scene`
 - `input` (null in still mode)
-- `soundLab` (null unless `?soundlab=1`)
+- `soundLab` (null when hidden by `?soundlab=0`, `?ui=0`, or preview/still capture settings)
 - `idlePose`
 
 Abstractions:

@@ -25,6 +25,7 @@ function readStillTime() {
 try {
   const stillTime = readStillTime();
   const hideUi = params.get('ui') === '0' || params.has('preview');
+  const showSoundLab = !hideUi && params.get('soundlab') !== '0';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.documentElement.dataset.reducedMotion = String(reducedMotion);
   document.documentElement.dataset.busy = 'false';
@@ -35,7 +36,7 @@ try {
     hint: document.getElementById('hint'),
     status: document.getElementById('status'),
     soundButton: document.getElementById('sound'),
-    soundLab: params.get('soundlab') === '1' ? document.getElementById('soundlab') : null,
+    soundLab: showSoundLab ? document.getElementById('soundlab') : null,
     debug,
     stillTime,
     hideUi,

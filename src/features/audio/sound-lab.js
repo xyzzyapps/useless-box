@@ -1,18 +1,18 @@
 const CUE_BUTTONS = [
-  { cue: 'switch:on', label: 'switch on' },
-  { cue: 'latch:click', label: 'latch' },
-  { cue: 'lid:open', label: 'lid open' },
-  { cue: 'arm:rise', label: 'arm rise' },
-  { cue: 'arm:reach', label: 'arm reach' },
-  { cue: 'switch:off', label: 'switch off' },
-  { cue: 'arm:retract', label: 'arm retract' },
-  { cue: 'lid:close', label: 'lid close' },
-  { cue: 'thunk', label: 'thunk' },
+  { cue: 'switch:on', label: 'on', title: 'Switch on' },
+  { cue: 'latch:click', label: 'latch', title: 'Latch click' },
+  { cue: 'lid:open', label: 'open', title: 'Lid opens' },
+  { cue: 'arm:rise', label: 'rise', title: 'Arm rises' },
+  { cue: 'arm:reach', label: 'reach', title: 'Arm reaches' },
+  { cue: 'switch:off', label: 'off', title: 'Switch off' },
+  { cue: 'arm:retract', label: 'retract', title: 'Arm retracts' },
+  { cue: 'lid:close', label: 'close', title: 'Lid closes' },
+  { cue: 'thunk', label: 'thunk', title: 'Final thunk' },
 ];
 
 /**
- * Debug-only sound audition panel. Enabled with ?soundlab=1 and never shown in
- * the normal Player Card view.
+ * Sound audition panel. Shown by default in the normal Player Card view, hidden
+ * by ?soundlab=0, and suppressed in preview/UI-less captures.
  */
 export function mountSoundLab({ container, audio, onCycle, logger = null }) {
   if (!container) return null;
@@ -28,7 +28,10 @@ export function mountSoundLab({ container, audio, onCycle, logger = null }) {
   const head = make('div', 'soundlab-head');
   const titleGroup = make('div', 'soundlab-title-group');
   titleGroup.append(make('strong', 'soundlab-title', 'SOUND LAB'));
-  titleGroup.append(make('span', 'soundlab-kicker', 'debug cues'));
+  const status = make('span', 'soundlab-kicker', 'tap a cue');
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  titleGroup.append(status);
   const closeButton = make('button', 'soundlab-close', '\u00d7');
   closeButton.type = 'button';
   closeButton.dataset.action = 'close';
@@ -40,7 +43,9 @@ export function mountSoundLab({ container, audio, onCycle, logger = null }) {
     const button = make('button', 'soundlab-cue', item.label);
     button.type = 'button';
     button.dataset.cue = item.cue;
-    button.dataset.label = item.label;
+    button.dataset.label = item.title;
+    button.title = item.title;
+    button.setAttribute('aria-label', item.title);
     grid.append(button);
   }
 
@@ -49,10 +54,7 @@ export function mountSoundLab({ container, audio, onCycle, logger = null }) {
   cycleButton.dataset.cue = 'cycle';
   cycleButton.dataset.label = 'full cycle';
 
-  const status = make('p', 'soundlab-status', 'Click a cue. The speaker button controls mute.');
-  status.setAttribute('aria-live', 'polite');
-
-  container.replaceChildren(head, grid, cycleButton, status);
+  container.replaceChildren(head, grid, cycleButton);
 
   const handleClick = async (event) => {
     const button = event.target.closest('button');
@@ -73,18 +75,18 @@ export function mountSoundLab({ container, audio, onCycle, logger = null }) {
     }
 
     if (audio.muted) {
-      status.textContent = 'Muted. Use the speaker button, then audition again.';
+      status.textContent = 'muted';
       return;
     }
 
     if (cue === 'cycle') {
       const started = typeof onCycle === 'function' ? onCycle() : false;
-      status.textContent = started ? 'Playing full cycle.' : 'Cycle is already running.';
+      status.textContent = started ? 'playing cycle' : 'cycle busy';
       return;
     }
 
     audio.playCue(cue);
-    status.textContent = `Playing ${button.dataset.label || cue}.`;
+    status.textContent = `playing ${button.dataset.label || cue}`;
     logger?.debug('sound lab cue', cue);
   };
 
