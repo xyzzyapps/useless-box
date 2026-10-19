@@ -1,8 +1,9 @@
 # Useless Box — Software Requirements Specification
 
-Status: implemented and verified  
+Status: implemented, deployed, and verified  
 Version: 1.0.0  
-Last updated: 2026-10-19
+Last updated: 2026-10-19  
+Live page: https://xyzzyapps.github.io/useless-box/
 
 ## 1. Purpose
 
@@ -61,7 +62,7 @@ Constraints:
 - The card metadata is cached by X. Post a new URL after changing tags or the preview image.
 - X's written rules reserve Player Cards for linear media and discourage games. Approval is not guaranteed. The page must still be a useful normal web page and provide a strong preview image as fallback.
 
-The current absolute URLs assume `https://xyzzyapps.github.io/useless-box/`.
+The current absolute URLs are deployed at `https://xyzzyapps.github.io/useless-box/` from GitHub Pages.
 
 ## 4. Functional requirements
 
@@ -631,11 +632,22 @@ A headless Chrome session was driven over the DevTools Protocol with a forced 48
 
 The curated `preview.png` was captured from `?preview=1` at 480x480.
 
-### 13.4 Manual checks still recommended
+### 13.4 Deployment verification
+
+The static site is live at `https://xyzzyapps.github.io/useless-box/`, served by GitHub Pages from `main` at `/`. The deployment was verified over HTTPS:
+
+- The page returns HTTP 200 with `text/html`.
+- `preview.png` returns HTTP 200 and is 480x480.
+- The vendored Three.js modules and the player entry module return HTTP 200 with JavaScript MIME types.
+- The response has no `X-Frame-Options` and no restrictive `Content-Security-Policy`.
+- The live HTML contains the expected Player Card and Open Graph metadata.
+- A live 480x480 headless smoke test clicked the switch, observed the FSM run, completed at timeline 3.8, returned to idle, and reported no runtime exceptions.
+
+### 13.5 Manual checks still recommended
 
 - Listen to the synthesized audio on speakers and headphones; verify gain balance.
 - Test on an actual iPhone Safari / Android Chrome in the X in-app browser.
-- Validate the card at X's card validator after deployment.
+- Validate the card at X's card validator in a normal logged-in browser. A headless check was attempted, but x.com returned HTTP 403 to the automated browser, so this step could not be completed programmatically.
 - Re-check the layout at a narrow iframe (for example 300x300) and in standalone portrait.
 
 ## 14. Deployment

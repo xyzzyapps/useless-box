@@ -4,7 +4,7 @@ A Three.js useless box you can share as an X Player Card. Push the switch; the l
 
 The demo is a single static page. Three.js is vendored locally, the wood, felt, acrylic, decals, environment, and shadow textures are procedural, and all sound is synthesized with the Web Audio API. There are no runtime CDN, font, image, or audio requests.
 
-Live page: <https://xyzzyapps.github.io/useless-box/>
+Live page: <https://xyzzyapps.github.io/useless-box/> (GitHub Pages, deployed from `main` at the repository root).
 
 ![The useless box with its lid open and acrylic finger at the switch](preview.png)
 
@@ -67,8 +67,10 @@ Then:
 2. In GitHub repository settings, enable Pages from `main` at `/ (root)`.
 3. Keep the included `.nojekyll` file so Pages does not run the files through Jekyll.
 4. Confirm `https://xyzzyapps.github.io/useless-box/` loads over HTTPS.
-5. Paste that URL into the [X Player Card validator](https://cards-dev.x.com/validator).
+5. Paste that URL into the [X Player Card validator](https://cards-dev.x.com/validator) while logged in to X.
 6. Post a **new** link. X caches card metadata; editing an existing post often leaves the old card in place.
+
+The deployment is live and its metadata, scripts, and 480x480 preview were verified over HTTPS. X blocks automated/headless validator requests with HTTP 403, so the final card-validator click has to happen in a normal logged-in browser.
 
 The host must not send `X-Frame-Options: DENY` or `SAMEORIGIN`, and must not set a CSP `frame-ancestors` directive that excludes `https://x.com` and `https://twitter.com`. GitHub Pages works for this.
 
@@ -143,7 +145,7 @@ See [SPEC.md](SPEC.md) for the full requirements, architecture, dimensions, timi
 
 - 21 unit tests cover easing, the interaction FSM, both-bone IK reach/mirroring/clamping, the complete cycle, cue ordering, final pose, folded-clearance, and lid-before-arm ordering.
 - `npm run check` verifies every JavaScript module parses and that the page still has the required Player Card metadata, local Three.js files, and no runtime CDN dependency.
-- A headless Chrome smoke test at a forced 480x480 viewport opened the page, clicked the projected switch position, observed the FSM enter `running`, confirmed the audio context was running, waited for the cycle to return to `idle`, verified the final switch/lid/arm angles, and found no runtime exceptions.
+- A headless Chrome smoke test at a forced 480x480 viewport ran against both the local server and the live GitHub Pages URL. It clicked the projected switch position, observed the FSM enter `running`, confirmed the audio context was running, waited for the cycle to return to `idle` at 3.8 seconds, verified the final switch/lid/arm angles, and found no runtime exceptions.
 - `preview.png` is a real 480x480 render from `?preview=1`.
 
 ## Third-party code

@@ -34,6 +34,9 @@
 - [x] Write README.md with local development, deployment, and X embed instructions
 - [x] Update TODO.md and prepare the final summary
 
-## Pending decisions
-- [ ] Publish the static site to GitHub Pages and validate the X Player Card
-- [ ] Commit the session once the user marks it done
+## Deployment
+- [x] Commit the project and create `xyzzyapps/useless-box`
+- [x] Push `main` and enable GitHub Pages from the repository root
+- [x] Verify the live page, assets, Player Card metadata, and iframe headers
+- [ ] Validate the X Player Card in a normal logged-in browser (headless validation is blocked with HTTP 403)
+- [x] Commit the completed work
