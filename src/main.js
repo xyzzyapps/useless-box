@@ -35,6 +35,7 @@ try {
     hint: document.getElementById('hint'),
     status: document.getElementById('status'),
     soundButton: document.getElementById('sound'),
+    soundLab: params.get('soundlab') === '1' ? document.getElementById('soundlab') : null,
     debug,
     stillTime,
     hideUi,

@@ -222,6 +222,127 @@
       display: block;
     }
 
+    .soundlab {
+      position: absolute;
+      top: max(14px, env(safe-area-inset-top, 0px));
+      left: max(14px, env(safe-area-inset-left, 0px));
+      z-index: 5;
+      width: min(292px, calc(100vw - 94px));
+      max-height: calc(100vh - 28px);
+      padding: 12px;
+      overflow: auto;
+      border: 1px solid rgba(255, 231, 194, 0.2);
+      border-radius: 14px;
+      background: rgba(35, 23, 15, 0.92);
+      box-shadow: 0 18px 50px rgba(39, 22, 10, 0.24);
+      color: #f7ecdc;
+      font-family: "Trebuchet MS", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .soundlab[hidden],
+    body.is-still .soundlab {
+      display: none !important;
+    }
+
+    .soundlab-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+
+    .soundlab-title-group {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .soundlab-title {
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+    }
+
+    .soundlab-kicker {
+      color: rgba(247, 236, 220, 0.48);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .soundlab-close {
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: 1px solid rgba(255, 238, 211, 0.16);
+      border-radius: 50%;
+      background: transparent;
+      color: rgba(247, 236, 220, 0.64);
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .soundlab-close:hover {
+      background: rgba(255, 244, 226, 0.1);
+      color: #fff7ea;
+    }
+
+    .soundlab-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .soundlab-cue,
+    .soundlab-cycle {
+      padding: 6px 8px;
+      border: 1px solid rgba(255, 234, 201, 0.14);
+      border-radius: 7px;
+      background: rgba(255, 243, 222, 0.07);
+      color: #f4e6d3;
+      font-family: inherit;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .soundlab-cue:hover,
+    .soundlab-cycle:hover {
+      background: rgba(255, 218, 153, 0.16);
+      border-color: rgba(255, 218, 153, 0.34);
+    }
+
+    .soundlab-cue:active,
+    .soundlab-cycle:active {
+      transform: translateY(1px);
+    }
+
+    .soundlab-cycle {
+      width: 100%;
+      margin-top: 7px;
+      padding: 7px 8px;
+      border-color: rgba(237, 184, 95, 0.3);
+      color: var(--accent);
+    }
+
+    .soundlab-status {
+      margin: 8px 0 0;
+      color: rgba(247, 236, 220, 0.58);
+      font-size: 9px;
+      line-height: 1.45;
+    }
+
+    .soundlab :focus-visible {
+      outline: 2px solid rgba(255, 221, 154, 0.9);
+      outline-offset: 2px;
+    }
+
     .loading {
       position: absolute;
       left: 50%;
@@ -344,6 +465,7 @@
       <span class="hint-accent">PUSH</span>
       <span>the switch</span>
     </p>
+    <section id="soundlab" class="soundlab" hidden aria-label="Sound audition panel"></section>
     <button id="sound" class="sound" type="button" aria-label="Mute sound" aria-pressed="false" title="Mute sound">
       <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 9.5h3.6L13 5.5v13l-5.4-4H4z" />

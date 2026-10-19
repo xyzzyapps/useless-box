@@ -5,6 +5,7 @@ import {
 } from '../features/box/cycle.js';
 import { createBoxScene } from '../features/box/scene.js';
 import { AudioEngine } from '../features/audio/audio-engine.js';
+import { mountSoundLab } from '../features/audio/sound-lab.js';
 import { InputController } from '../features/interaction/input-controller.js';
 import { InteractionMachine, InteractionState } from '../core/interaction-machine.js';
 import { createLogger } from '../core/logger.js';
@@ -24,6 +25,7 @@ export class UselessBoxApp {
     stillTime = null,
     hideUi = false,
     reducedMotion = false,
+    soundLab = null,
   }) {
     this.canvas = canvas;
     this.stage = stage;
@@ -44,6 +46,7 @@ export class UselessBoxApp {
     this.raf = null;
     this.hintTimer = null;
     this.resizeObserver = null;
+    this.soundLab = null;
 
     this.idlePose = sampleCycle(0);
     this.machine = new InteractionMachine({
@@ -70,6 +73,14 @@ export class UselessBoxApp {
     else this.scene.applyIdlePose(this.idlePose);
 
     this._bindUi();
+    if (soundLab) {
+      this.soundLab = mountSoundLab({
+        container: soundLab,
+        audio: this.audio,
+        onCycle: () => this.trigger('soundlab'),
+        logger: this.logger,
+      });
+    }
     this._bindResize();
     this._resize();
     this._startLoop();
@@ -100,6 +111,7 @@ export class UselessBoxApp {
     this._clearHintTimer();
     window.clearTimeout(this.hintTimer);
     this.input?.dispose();
+    this.soundLab?.dispose();
     window.removeEventListener('pointermove', this._onPointerMove);
     window.removeEventListener('pointerleave', this._onPointerLeave);
     window.removeEventListener('resize', this._onResize);

@@ -108,12 +108,24 @@ The page synthesizes:
 
 - A first switch click on activation.
 - A latch tick.
-- Lid-opening servo whirr and creak.
-- Arm rise and reach servo whirrs.
+- A slow, loaded lid-opening motor with hinge friction.
+- A faster arm-rise motor and a higher-load arm-reach motor.
 - A switch-off click.
-- Arm retraction servo.
-- Lid-closing servo and creak.
+- A reversing arm-retraction motor.
+- A descending lid-closing motor and hinge friction.
 - A low final thunk.
+
+The motor voice is deliberately not a musical oscillator:
+
+- Broadband gearbox noise through low-Q filters, pulsed by a 20–45 Hz tremolo.
+- A quiet 58–90 Hz motor hum plus a weak harmonic.
+- A thin 3.2–4.5 kHz gear hiss.
+- A faint 1.7–2.7 kHz electronic whine.
+- A short high-frequency fax-style handshake at movement start: two high carriers with a fast amplitude warble.
+- Randomized short gear-chatter grains.
+- Dry start, end-of-travel, and gear-lash clicks.
+
+Sawtooth oscillators and high-Q pitched filter sweeps are intentionally absent; they previously produced a brass-like timbre.
 
 Audio starts on the first pointer or keyboard gesture. No audio file is downloaded. A speaker button toggles mute and updates `aria-pressed`, `aria-label`, and the icon.
 
@@ -128,9 +140,10 @@ Audio starts on the first pointer or keyboard gesture. No audio file is download
 ### FR-8 Debug and still modes
 
 - `?debug=1` enables verbose logs and exposes `window.__uselessBox`.
+- `?soundlab=1` mounts a debug-only cue audition panel with buttons for every cue and a full-cycle replay button.
 - `?still=<seconds>` freezes the pose at that cycle time, disables pointer input, and hides no UI unless `ui=0`.
 - `?still=idle` or `?still=0` freezes the initial pose.
-- `?ui=0` hides the hint, speaker control, and loading text.
+- `?ui=0` hides the hint, speaker control, sound lab, and loading text.
 - `?preview=1` freezes at 1.95 seconds and hides UI. This produced `preview.png`.
 
 ### FR-9 Error handling
@@ -232,7 +245,8 @@ flowchart LR
 | Model | `src/features/box/model.js` | Box, lid, toggle, acrylic finger, mechanism |
 | Assets | `src/shared/textures.js` | Procedural maps and studio environment |
 | Input | `src/features/interaction/input-controller.js` | Raycast, hover, pointer, keyboard |
-| Audio | `src/features/audio/audio-engine.js` | Web Audio synthesis and mute |
+| Audio | `src/features/audio/audio-engine.js` | Mechanical/fax-like Web Audio synthesis and mute |
+| Sound lab | `src/features/audio/sound-lab.js` | Debug-only cue audition panel |
 | Presentation | `index.html` | Player Card metadata, CSS, overlays, import map |
 | Tooling | `scripts/` | Static server and static checks |
 
@@ -250,6 +264,7 @@ src/
   core/logger.js
   core/math.js
   features/audio/audio-engine.js
+  features/audio/sound-lab.js
   features/box/cycle.js
   features/box/ik.js
   features/box/layout.js
@@ -370,15 +385,15 @@ The channel functions use easing from `src/core/math.js`:
 
 | Time | Cue | Synthesis |
 | --- | --- | --- |
-| 0.00 | `switch:on` | Noise click + short triangle drop |
-| 0.18 | `latch:click` | Two filtered noise ticks |
-| 0.30 | `lid:open` | Saw servo + band-passed creak |
-| 1.00 | `arm:rise` | Higher servo sweep + gear noise |
-| 1.45 | `arm:reach` | Servo sweep |
-| 2.00 | `switch:off` | Stronger click + triangle drop |
-| 2.15 | `arm:retract` | Descending servo |
-| 2.80 | `lid:close` | Descending servo + creak |
-| 3.55 | `thunk` | Low sine drop + low-passed noise |
+| 0.00 | `switch:on` | Impact noise + low body + brief metal tick |
+| 0.18 | `latch:click` | Two dry filtered-noise contacts |
+| 0.30 | `lid:open` | Slow layered motor + fax chirp + hinge noise |
+| 1.00 | `arm:rise` | Fast layered motor + fax chirp + dense gear chatter |
+| 1.45 | `arm:reach` | Higher-load motor + shorter fax chirp |
+| 2.00 | `switch:off` | Stronger impact click + metal tick |
+| 2.15 | `arm:retract` | Reversing motor + descending chirp |
+| 2.80 | `lid:close` | Descending motor + hinge friction |
+| 3.55 | `thunk` | Low sine drop + low-passed noise + case rattles |
 
 Cues are consumed once by index and are returned in schedule order, even if multiple cues become due in one frame.
 
@@ -572,17 +587,33 @@ The canvas label and `aria-busy` reflect the current state.
 
 ## 12. Audio implementation
 
-`AudioEngine` creates a single `AudioContext` on the first gesture, with an input compressor and a master gain (0.48). It builds a reusable white-noise buffer and schedules short oscillators, filtered noise, LFOs, and gain envelopes.
+`AudioEngine` creates a single `AudioContext` on the first gesture, with an input compressor (threshold -20 dB, ratio 4:1) and a master gain (0.44). It builds a reusable white-noise buffer and schedules filtered noise, sine/triangle drones, LFOs, grains, and gain envelopes. Sawtooth oscillators are not used.
+
+The `_motor` voice combines:
+
+- A gearbox-noise path: looped noise → bandpass (Q 0.72) → highpass at 280 Hz → tremolo gain modulated at 20–45 Hz → envelope.
+- A high-gear hiss path: looped noise → bandpass around 3.2–4.2 kHz (Q 0.52) → envelope.
+- A low sine hum at roughly 58–90 Hz, plus a weak triangle harmonic.
+- A triangle electronic whine around 1.7–2.1 kHz and a quiet sine fax whine around 2.7–3.2 kHz.
+- A stochastic gear-chatter sequence: 2–14 short 2.5–7.5 ms noise grains per movement, with randomized bandpass centers and amplitudes.
+- A dry start contact, low current-surge thump, end-of-travel tick, and gear-lash thump.
+- `_faxChirp`: two high sine carriers (approximately 2.05–2.27 kHz and 3.0–3.4 kHz) with a 34–46 Hz sine gate, a short exponential envelope, and a direction-dependent sweep.
+
+The `_hinge` voice uses low-Q filtered noise, a slow irregular amplitude modulation, and random stick-slip grains. No high-Q resonator is used, so it cannot produce a musical squeal.
+
+`_switchClick` uses short high-band noise, a filtered low sine body, a very short inharmonic metal tick, and a rebound grain. `_thunk` uses a low sine drop, low-passed noise, and case rattles.
 
 Mute:
 
 - `setMuted(true)` ramps master gain to 0.0001.
-- `setMuted(false)` ramps back to 0.48.
+- `setMuted(false)` ramps back to 0.44.
 - The state is reflected on the speaker button.
 
 The first switch click is scheduled even if `AudioContext.resume()` is still pending; Web Audio plays it when the context starts. This avoids a silent first interaction.
 
 No sound plays before a user gesture because the context is not created until then.
+
+The debug-only `SoundLab` panel is mounted with `?soundlab=1`. It imports the cue buttons, unlocks audio on the first audition click, reports the current cue in a live status line, and can replay the full visual/audio cycle. It is hidden by default and in still/preview modes.
 
 ## 13. Testing and verification
 
@@ -632,6 +663,8 @@ A headless Chrome session was driven over the DevTools Protocol with a forced 48
 
 The curated `preview.png` was captured from `?preview=1` at 480x480.
 
+An audio-specific headless Chrome pass then exercised every cue through an `AnalyserNode`. All cues produced signal, the peak output stayed between 0.037 and 0.153 (well below full scale), the sound lab mounted with the expected buttons, and no runtime exceptions were recorded. This verifies level safety and routing, not subjective timbre; the sound lab remains the review surface for the final tonal judgment.
+
 ### 13.4 Deployment verification
 
 The static site is live at `https://xyzzyapps.github.io/useless-box/`, served by GitHub Pages from `main` at `/`. The deployment was verified over HTTPS:
@@ -673,6 +706,7 @@ Do not add `X-Frame-Options` or a restrictive `frame-ancestors` CSP. The include
   - `scene.model.arm.shoulder.rotation.x`
   - `scene.renderer.info.render`
 - Freeze a pose with `?still=<seconds>&ui=0`; use browser devtools to inspect the scene.
+- Open `?soundlab=1` to audition each cue or the full cycle.
 - Regenerate the preview with a headless browser pointed at `?preview=1` at 480x480.
 - The dev server prints its URL, debug URL, and preview still URL.
 
@@ -717,6 +751,7 @@ new UselessBoxApp({
   hint,          // hint element
   status,        // aria-live element
   soundButton,   // HTMLButtonElement
+  soundLab = null, // debug audition container
   debug = false,
   stillTime = null,
   hideUi = false,
@@ -734,6 +769,7 @@ app.dispose()
 - `audio`
 - `scene`
 - `input` (null in still mode)
+- `soundLab` (null unless `?soundlab=1`)
 - `idlePose`
 
 Abstractions:
@@ -744,4 +780,5 @@ Abstractions:
 - `solveTwoBone2D({ root, lengths, target, bend })`: pure IK.
 - `createBoxScene({ canvas, logger, reducedMotion })`: returns scene, camera, renderer, model, lights, rig, pose/resize/update/render methods.
 - `AudioEngine`: `unlock()`, `setMuted()`, `playCue()`, `dispose()`, `supported`, `muted`, `ctx`.
+- `mountSoundLab({ container, audio, onCycle, logger })`: creates the debug cue panel and returns a disposable handle.
 - `InputController`: `setEnabled()`, `refreshHover()`, `dispose()`.

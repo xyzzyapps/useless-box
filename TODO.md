@@ -40,3 +40,13 @@
 - [x] Verify the live page, assets, Player Card metadata, and iframe headers
 - [ ] Validate the X Player Card in a normal logged-in browser (headless validation is blocked with HTTP 403)
 - [x] Commit the completed work
+
+## Sound redesign
+- [x] Replace sawtooth servo/creak oscillators that read as brass with layered motor noise, low-frequency hum, amplitude modulation, and randomized gear chatter
+- [x] Add distinct start/stop mechanical transients for the lid and acrylic arm
+- [x] Tighten switch clicks and separate mechanical contact sounds from body thunks
+- [x] Add a debug-only sound audition panel for reviewing each cue in isolation
+- [x] Check peak levels in Chrome with an analyser and verify no clipping
+- [x] Add a higher, fax-like electronic handshake and servo whine
+- [ ] Await user audition and sound approval
+- [ ] Update SPEC/README, commit, and deploy the revised sound to GitHub Pages
